@@ -1,0 +1,8 @@
+{
+    "name": "appmixer.mews_webhooks.eventgrid.EventReceived",
+    "version": "1.0.10",
+    "private": true,
+    "main": "EventReceived.js",
+    "author": "Mews <martin.horak@mews.com>",
+    "dependencies": {}
+}
