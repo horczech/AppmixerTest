@@ -11,10 +11,10 @@
 
 module.exports = async context => {
     // Register the plugin endpoint route with dynamic path parameters
-    // Format: /flows/{flowId}/components/{componentId} (matches standard webhook URL format)
+    // Format: /plugins/mews_plugin_webhook/eventgrid/{flowId}/{componentId}
     context.http.router.register({
         method: 'POST',
-        path: '/flows/{flowId}/components/{componentId}',
+        path: '/eventgrid/{flowId}/{componentId}',
         options: {
             auth: false,
             handler: async (req, h) => {
@@ -52,30 +52,32 @@ module.exports = async context => {
         }
     });
 
-    // Register OPTIONS handler for CloudEvents validation handshake
+    // Register OPTIONS handler for Azure Event Grid CloudEvents validation handshake
+    // Note: Azure Event Grid sends OPTIONS with 'webhook-request-origin' header (not standard CORS)
+    // We must disable Hapi's CORS handling so our custom handler can respond
     context.http.router.register({
         method: 'OPTIONS',
-        path: '/flows/{flowId}/components/{componentId}',
+        path: '/eventgrid/{flowId}/{componentId}',
         options: {
             auth: false,
             handler: async (req, h) => {
-                await context.log('info', 'eventgrid-plugin-route-options-handshake', { 
+                await context.log('info', 'eventgrid-plugin-route-options-handshake', {
                     message: ">>>>> OPTIONS HANDSHAKE HIT"
                 });
 
                 const requestOrigin = req.headers['webhook-request-origin'];
                 const response = h.response();
-                
+
                 if (requestOrigin) {
                     response.header('WebHook-Allowed-Origin', requestOrigin);
                 }
-                
-                await context.log('info', 'eventgrid-plugin-route-options-handshake', { 
+
+                await context.log('info', 'eventgrid-plugin-route-options-handshake', {
                     origin: requestOrigin,
                     flowId: req.params.flowId,
                     componentId: req.params.componentId
                 });
-                
+
                 return response.code(200);
             }
         }

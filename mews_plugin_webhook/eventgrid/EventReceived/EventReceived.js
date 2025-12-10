@@ -42,17 +42,16 @@ module.exports = {
         }
         
         // Build unique plugin endpoint URL for this component instance
-        // Format: https://api.YOUR_TENANT.appmixer.cloud/flows/{flowId}/components/{componentId}
-        // Matches standard webhook URL format but handled by plugin endpoint
+        // Format: https://api.YOUR_TENANT.appmixer.cloud/plugins/mews_plugin_webhook/eventgrid/{flowId}/{componentId}
         // Get tenant URL from context properties or use default
         const tenantUrl = context.properties?.tenantUrl 
             || context.auth?.tenantUrl 
             || 'https://api.powerful-collie-1942.appmixer.cloud';
         
-        // Create unique endpoint per component instance using standard webhook URL format
+        // Create unique plugin endpoint per component instance
         const flowId = context.flowId;
         const componentId = context.componentId;
-        return `${tenantUrl}/flows/${flowId}/components/${componentId}`;
+        return `${tenantUrl}/plugins/mews_plugin_webhook/eventgrid/${flowId}/${componentId}`;
     },
 
     /**
